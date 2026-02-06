@@ -195,7 +195,7 @@ Troubleshooting steps:
 # ============================================================================
 
 
-def keyboard_listener(state: dict, stop_event: threading.Event):
+def keyboard_listener(state: dict, stop_event: threading.Event, action_lock: threading.Lock):
     """Background thread that listens for keyboard input with timeout."""
     import termios
     import tty
@@ -226,21 +226,23 @@ def keyboard_listener(state: dict, stop_event: threading.Event):
                     if current_time - last_action_time < 0.2:
                         continue
                     
-                    if key_upper == "T":
-                        state["action"] = "tare"
-                        last_action_time = current_time
-                    elif key_upper == "R":
-                        state["action"] = "reset"
-                        last_action_time = current_time
-                    elif key_upper == "M":
-                        state["action"] = "toggle_units"
-                        last_action_time = current_time
-                    elif key == "\x1b":  # ESC key
-                        state["action"] = "exit_esc"
-                        break
-                    elif key == "\x03":  # Ctrl-C
-                        state["action"] = "exit_ctrl_c"
-                        break
+                    # Thread-safe state update
+                    with action_lock:
+                        if key_upper == "T":
+                            state["action"] = "tare"
+                            last_action_time = current_time
+                        elif key_upper == "R":
+                            state["action"] = "reset"
+                            last_action_time = current_time
+                        elif key_upper == "M":
+                            state["action"] = "toggle_units"
+                            last_action_time = current_time
+                        elif key == "\x1b":  # ESC key
+                            state["action"] = "exit_esc"
+                            break
+                        elif key == "\x03":  # Ctrl-C
+                            state["action"] = "exit_ctrl_c"
+                            break
                 except Exception as e:
                     logger.debug(f"Key read error: {e}")
     finally:
@@ -281,11 +283,12 @@ def main():
 
         show_help_message()
 
-        # Start keyboard listener thread
+        # Start keyboard listener thread with thread-safe action state
         state = {"action": None}
+        action_lock = threading.Lock()
         stop_event = threading.Event()
         kb_thread = threading.Thread(
-            target=keyboard_listener, args=(state, stop_event), daemon=True
+            target=keyboard_listener, args=(state, stop_event, action_lock), daemon=True
         )
         kb_thread.start()
 
@@ -295,17 +298,18 @@ def main():
         try:
             stream.set_nonblocking(1)
             while not should_exit:
-                # Check for pending keyboard action
-                action = state.get("action")
+                # Check for pending keyboard action (thread-safe)
+                with action_lock:
+                    action = state.get("action")
+                    if action:
+                        state["action"] = None  # Clear action atomically
+                
                 if action == "tare":
                     current_offset = current_raw
-                    state["action"] = None
                 elif action == "reset":
                     current_offset = absolute_zero
-                    state["action"] = None
                 elif action == "toggle_units":
                     is_metric = not is_metric
-                    state["action"] = None
                 elif action in ("exit_esc", "exit_ctrl_c"):
                     break
 
