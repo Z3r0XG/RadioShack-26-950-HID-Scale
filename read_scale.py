@@ -24,7 +24,7 @@ import threading
 import time
 import signal
 import select
-from typing import Optional, Tuple
+from typing import Optional
 
 try:
     import hid
