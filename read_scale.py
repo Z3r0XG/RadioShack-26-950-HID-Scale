@@ -19,7 +19,6 @@ Controls:
 """
 
 import sys
-import struct
 import logging
 import threading
 import time
