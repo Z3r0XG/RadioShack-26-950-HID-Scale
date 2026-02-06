@@ -54,5 +54,14 @@ if ($device.TryOpen([ref]$stream)) {
         }
     } finally { $stream.Close() }
 } else {
-    Write-Host "Device not found."
+    Write-Host @"
+Device not found or could not be opened.
+
+Troubleshooting steps:
+  - Make sure the RadioShack 26-950 scale is connected and powered on.
+  - Verify the USB VID/PID (expected VID=0x2233, PID=0x6323).
+  - Check that the required USB/HID drivers are installed and the device appears in Device Manager.
+  - If running on Windows, try launching PowerShell as Administrator and re-running this script.
+  - Ensure no other application is currently using the device.
+"@
 }
