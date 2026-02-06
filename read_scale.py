@@ -206,7 +206,9 @@ def keyboard_listener(state: dict, stop_event: threading.Event, action_lock: thr
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
         tty.setraw(fd)
-    except:
+    except (OSError, ValueError, AttributeError) as e:
+        # Non-TTY stdin (e.g., pipe, file) or termios unavailable
+        logger.debug(f"Terminal raw mode setup failed: {e}")
         fd = None
     
     try:
@@ -249,7 +251,7 @@ def keyboard_listener(state: dict, stop_event: threading.Event, action_lock: thr
         if fd is not None:
             try:
                 termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-            except:
+            except (OSError, ValueError):
                 pass
 
 
