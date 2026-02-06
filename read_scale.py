@@ -251,8 +251,8 @@ def keyboard_listener(state: dict, stop_event: threading.Event, action_lock: thr
         if fd is not None:
             try:
                 termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-            except (OSError, ValueError):
-                pass
+            except (OSError, ValueError) as e:
+                logger.debug(f"Terminal settings restoration failed: {e}")
 
 
 def main():
