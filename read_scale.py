@@ -126,7 +126,7 @@ def format_weight_display(weight_oz: float, is_metric: bool) -> str:
             return f"{prefix}{kg:.3f} kg"
         else:
             # Use grams for smaller weights
-            return f"{prefix}{abs(grams):.1f} g "
+            return f"{prefix}{abs(grams):.1f} g"
     else:
         # Imperial: pounds and ounces
         if abs_weight >= OUNCES_PER_POUND:
