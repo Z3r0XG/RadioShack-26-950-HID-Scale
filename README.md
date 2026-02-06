@@ -1,27 +1,9 @@
 # RadioShack 26-950 USB Scale Driver
 
-Cross-platform utilities for the RadioShack 26-950 USB scale. These scripts read the raw HID stream directly, bypassing obsolete legacy drivers.
+Cross-platform utility for the RadioShack 26-950 USB scale. Reads the raw HID stream directly, bypassing obsolete legacy drivers.
 
 ## Installation
 
-Choose your preferred implementation:
-
-**Windows — PowerShell**
-```powershell
-git clone https://github.com/Z3r0XG/RadioShack-26-950-HID-Scale.git
-cd RadioShack-26-950-HID-Scale
-
-# Download HidSharp.dll
-$url = "https://www.nuget.org/api/v2/package/HidSharp/2.1.0"
-Invoke-WebRequest -Uri $url -OutFile "hidsharp.zip"
-Expand-Archive -Path "hidsharp.zip" -DestinationPath "temp_hid" -Force
-Move-Item "temp_hid\lib\net45\HidSharp.dll" ".\HidSharp.dll"
-Remove-Item "hidsharp.zip", "temp_hid" -Recurse
-
-.\read_scale.ps1
-```
-
-**Linux/macOS — Python**
 ```bash
 git clone https://github.com/Z3r0XG/RadioShack-26-950-HID-Scale.git
 cd RadioShack-26-950-HID-Scale
@@ -35,12 +17,10 @@ python3 read_scale.py
 - RadioShack 26-950 Scale (VID: `0x2233`, PID: `0x6323`)
 
 **Software:**
-- **Windows:** PowerShell 5.0+, `HidSharp.dll` v2.1.0
-- **Linux/macOS:** Python 3.7+, `hidapi` package
+- Python 3.7+
+- `hidapi` package (`pip install hidapi`)
 
-Install Python dependencies with: `pip install hidapi`
-
-**Linux system libraries** (optional, if hidapi pip install fails):
+**System libraries** (if hidapi pip install fails):
 - Ubuntu/Debian: `sudo apt install libhidapi-dev`
 - Fedora/RHEL: `sudo dnf install hidapi-devel`
 - macOS: `brew install hidapi`
