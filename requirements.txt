@@ -1,0 +1,4 @@
+# Runtime dependency. Provides the `hid` module.
+# Note: PyPI also has a different package that imports as `hid`; if you have
+# both, `pip uninstall hid` and keep this one.
+hidapi>=0.14.0

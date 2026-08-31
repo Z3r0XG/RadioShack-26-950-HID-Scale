@@ -1,0 +1,21 @@
+# Non-root access to the RadioShack 26-950 USB scale (and rebadged variants).
+#
+# Install:
+#   sudo cp 99-radioshack-scale.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+# Then unplug and replug the scale.
+#
+# TAG+="uaccess" grants access to the user logged in at the local seat, which
+# covers desktop use on any systemd distribution.
+#
+# Headless systems have no seat, so uaccess grants nothing there. Uncomment the
+# two GROUP lines below and set them to a group you belong to. plugdev exists on
+# Debian and Ubuntu; Fedora, RHEL and Arch do not create it, so pick an existing
+# group (`id -Gn`) or create one first, otherwise udev cannot resolve the name
+# and leaves the device owned by root.
+
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="2233", ATTRS{idProduct}=="6323", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="2233", ATTRS{idProduct}=="6323", TAG+="uaccess"
+
+#SUBSYSTEM=="hidraw", ATTRS{idVendor}=="2233", ATTRS{idProduct}=="6323", GROUP="plugdev", MODE="0660"
+#SUBSYSTEM=="usb", ATTRS{idVendor}=="2233", ATTRS{idProduct}=="6323", GROUP="plugdev", MODE="0660"
